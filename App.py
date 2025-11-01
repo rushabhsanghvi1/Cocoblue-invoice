@@ -481,11 +481,12 @@ if st.button("🔄 Generate Merged PDF", type="primary", use_container_width=Tru
                         address_width_mm = pdf.w - pdf.r_margin - pdf.l_margin - 35 - 45
                         # Estimate chars per line (approx 2.2mm per char for 9pt)
                         try:
-                            chars_per_line = int(address_width_mm / 2.2)
+                            # A better guess: mm / (font_size_pt * 0.35 * 0.7)
+                            chars_per_line = int(address_width_mm / (9 * 0.35 * 0.7)) 
                         except ZeroDivisionError:
                             chars_per_line = 45 # A safe default
                         
-                        lines = textwrap.wrap(addr, width=chars_per_line, replace_whitespace=False)
+                        lines = textwrap.wrap(addr, width=chars_per_line, replace_whitespace=False, drop_whitespace=False)
                         if not lines:
                             lines = [''] # Ensure at least one line
 
@@ -504,7 +505,11 @@ if st.button("🔄 Generate Merged PDF", type="primary", use_container_width=Tru
                                 pdf.ln()
                     
                     # --- Finalize PDF in memory ---
-                    pdf_bytes = pdf.output(dest='S').encode('latin-1')
+                    # 
+                    #  THE FIX IS HERE:
+                    #  pdf.output(dest='S') already returns bytes, no .encode() needed
+                    #
+                    pdf_bytes = pdf.output(dest='S') 
                     
                     st.session_state.pdf_bytes = pdf_bytes
                     safe_invoice_id = sanitize_filename(selected_invoice_id)
@@ -530,3 +535,4 @@ if st.session_state.pdf_bytes:
 # --- Credits Label ---
 st.markdown("---")
 st.caption(DEFAULT_CREDITS)
+
