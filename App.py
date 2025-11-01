@@ -509,7 +509,7 @@ if st.button("🔄 Generate Merged PDF", type="primary", use_container_width=Tru
                     #  THE FIX IS HERE:
                     #  pdf.output(dest='S') already returns bytes, no .encode() needed
                     #
-                    pdf_bytes = pdf.output(dest='S') 
+                    pdf_bytes = bytes(pdf.output(dest='S'))
                     
                     st.session_state.pdf_bytes = pdf_bytes
                     safe_invoice_id = sanitize_filename(selected_invoice_id)
@@ -535,4 +535,5 @@ if st.session_state.pdf_bytes:
 # --- Credits Label ---
 st.markdown("---")
 st.caption(DEFAULT_CREDITS)
+
 
